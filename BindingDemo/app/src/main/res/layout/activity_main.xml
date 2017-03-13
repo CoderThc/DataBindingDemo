@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="bean"
+            type="com.thc.bindingdemo.BindingDemoBean" />
+
+        <variable
+            name="beans"
+            type="java.util.ArrayList&lt;com.thc.bindingdemo.BindingDemoBean>" />
+
+        <variable
+            name="strings"
+            type="java.util.ArrayList&lt;String>" />
+
+        <variable
+            name="map"
+            type="java.util.HashMap&lt;String,String>" />
+
+        <variable
+            name="str"
+            type="String" />
+
+        <variable
+            name="num"
+            type="int" />
+
+        <variable
+            name="myImageUrl"
+            type="String" />
+
+        <variable
+            name="presenter"
+            type="com.thc.bindingdemo.MainActivity.Presenter" />
+
+        <variable
+            name="time"
+            type="java.util.Date"/>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/activity_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!--三元运算符-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:visibility="@{bean.age>10?View.VISIBLE:View.GONE}" />
+            <!--空合并运算符 取两个中不为null的数据-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{strings.get(0)??beans.get(0).name}" />
+
+            <!--显示Bean中的姓名+个数+字符串-->
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{bean.name + num + str}" />
+
+            <!--显示map中的值-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{"map中的值：" + map.get("key")}' />
+
+            <!--学校-->
+            <TextView
+                android:id="@+id/tvSchool"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{bean.school}" />
+
+            <!--班级-->
+            <TextView
+                android:id="@+id/tvClassName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{bean.className}" />
+
+            <!--
+            年龄
+            bean中的成员变量必须是String类型的，如果是int类型，就用下面方法转成String
+            -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(bean.age)}" />
+
+            <!--取集合List<BindingBean>中的数据，设置姓名-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{beans.size>0?beans.get(0).name:bean.name}" />
+
+            <!--取List<String>中的数据-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{strings.get(0)}" />
+
+            <!--写死的字符+动态字符 方式1-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{bean.name + @string/app_name}" />
+
+            <!--写死的字符+动态字符 方式2-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{"写似"+bean.name }' />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{presenter.listenBind}"
+                android:text="单独更新" />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{()->presenter.lambda(bean)}"
+                android:text="全部更新" />
+
+            <include
+                android:id="@+id/includeBar"
+                layout="@layout/include_test" />
+
+            <!--表达式链，就比如iv1、iv2的显示隐藏都和 bean的age大小有关，那么可以简化为如下方式-->
+            <ImageView
+                android:id="@+id/iv1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:visibility="@{bean.age>10?View.VISIBLE:View.GONE}" />
+
+            <ImageView
+                android:id="@+id/iv2"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/img2"
+                android:visibility="@{iv1.visibility}" />
+
+            <!--自定义BindAdapter placeholderDraw和imageUrl必须和你的定义的静态方法中的参数一样的-->
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:imageUrl="@{str}"
+                app:placeholderDraw="@{@drawable/img2}" />
+            <!--自定义BindAdapter text必须和你的定义的静态方法中的参数一样的-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:text='@{map.get("key")}' />
+
+            <!--自定义setter-->
+            <com.thc.bindingdemo.MyImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:imgUrl="@{myImageUrl}" />
+
+            <!--BindingConversion-->
+            <TextView
+                android:text="@{time}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!--双向绑定，动态修改学校-->
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="@={bean.school}"/>
+
+            <Button
+                android:onClick="@{presenter.goRecyclerView}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RecyclerView"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</layout>
